@@ -61,8 +61,10 @@ public class PlayProgramCode : MonoBehaviour
         if(startProgram == 1)
         {
             //Debug.Log("Mis on2");
-            codeLine = programCodeLines[index].Split(char.Parse(";")).ToList();
-            int checkIndex = index;
+            codeLine = programCodeLines[index].Split(';').ToList();
+
+Debug.Log("Reading line " + index + ": '" +
+          programCodeLines[index] + "'");
             
             
             
@@ -106,15 +108,31 @@ public class PlayProgramCode : MonoBehaviour
             }
 
             // Control gripper
-            if(codeLine.Count == 1 && gripState.closingState == 0 )
-            {   
-                Debug.Log("Gripper moving state: "+gripState.closingState);
-                
-                gripState.closingState = int.Parse(codeLine[0]);
-                 Debug.Log("Gripper moving state: "+gripState.closingState);
-                index++;
-                
-            }
+            // Control gripper
+if (codeLine.Count == 1 && gripState.closingState == 0)
+{
+    string gripperCommand = codeLine[0].Trim();
+
+    if (int.TryParse(gripperCommand, out int gripperState))
+    {
+        Debug.Log("Gripper moving state: " + gripState.closingState);
+
+        gripState.closingState = gripperState;
+
+        Debug.Log("New gripper state: " + gripState.closingState);
+
+        index++;
+    }
+    else
+    {
+        Debug.LogError(
+            "Invalid gripper command at line " + index +
+            ": '" + gripperCommand + "'"
+        );
+
+        startProgram = 0;
+    }
+}
 
             if(reach == rController.allJoints.Count && gripState.closingState==0)
             {
